@@ -1,0 +1,32 @@
+{
+  "name": "convert-case-ts",
+  "version": "0.1.0",
+  "description": "Type-safe string case conversion library for TypeScript",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "typescript",
+    "case",
+    "string",
+    "convert",
+    "capitalize",
+    "uppercase",
+    "lowercase",
+    "type-safe"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.3.0",
+    "vitest": "^1.0.0"
+  }
+}
