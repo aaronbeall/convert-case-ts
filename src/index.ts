@@ -29,18 +29,24 @@ type SplitCamelCase<S extends string, Acc extends string = ''> =
         : Acc extends ''
           // Start of segment with uppercase
           ? SplitCamelCase<Rest, Char>
-          // Have accumulated lowercase word
+          // Have accumulated text
           : Rest extends `${infer Next}${string}`
             ? Next extends Lowercase<Next>
               ? Lowercase<Next> extends Next
                 // Next is lowercase letter - split before this capital
-                // e.g., "helloWorld" → split at W
+                // e.g., "helloWorld" → split at W, "XMLParser" → split at P
                 ? [Acc, ...SplitCamelCase<`${Char}${Rest}`>]
                 : SplitCamelCase<Rest, `${Acc}${Char}`>
-              // Next is uppercase - split here
-              // e.g., "XMLParser" → split between L and P
-              : [Acc, ...SplitCamelCase<`${Char}${Rest}`>]
-            : [Acc, Char]  // End of string
+              // Next is also uppercase - check if Acc is all uppercase
+              : Acc extends Lowercase<Acc>
+                // Acc is lowercase, split here (e.g., "helloWORLD" → ["hello", "WORLD"])
+                ? [Acc, ...SplitCamelCase<`${Char}${Rest}`>]
+                // Acc is uppercase, keep accumulating (e.g., "HELLO" stays together)
+                : SplitCamelCase<Rest, `${Acc}${Char}`>
+            // End of string - combine Acc with Char
+            : Acc extends ''
+              ? [Char]
+              : [`${Acc}${Char}`]
       // Lowercase or non-letter, accumulate
       : SplitCamelCase<Rest, `${Acc}${Char}`>
     : Acc extends ''
@@ -106,6 +112,19 @@ export type KebabCase<S extends string> =
 type KebabCaseRest<T extends string[]> = 
   T extends [infer First extends string, ...infer Rest extends string[]]
     ? `-${Lowercase<First>}${KebabCaseRest<Rest>}`
+    : '';
+
+/**
+ * Converts a string to SCREAMING_SNAKE_CASE type
+ */
+export type ScreamingSnakeCase<S extends string> = 
+  Words<S> extends [infer First extends string, ...infer Rest extends string[]]
+    ? `${Uppercase<First>}${ScreamingSnakeCaseRest<Rest>}`
+    : Uppercase<S>;
+
+type ScreamingSnakeCaseRest<T extends string[]> = 
+  T extends [infer First extends string, ...infer Rest extends string[]]
+    ? `_${Uppercase<First>}${ScreamingSnakeCaseRest<Rest>}`
     : '';
 
 // ============================================================================
@@ -254,4 +273,23 @@ export function kebabCase<T extends string>(str: T): KebabCase<T> {
   return words
     .map(word => word.toLowerCase())
     .join('-') as KebabCase<T>;
+}
+
+/**
+ * Converts a string to SCREAMING_SNAKE_CASE with type-safe return type
+ * @param str - The string to convert
+ * @returns The SCREAMING_SNAKE_CASE version of the string
+ * 
+ * @example
+ * const result = screamingSnakeCase("hello world"); // Type: "HELLO_WORLD"
+ * const result2 = screamingSnakeCase("helloWorld"); // Type: "HELLO_WORLD"
+ * const result3 = screamingSnakeCase("HelloWorld"); // Type: "HELLO_WORLD"
+ */
+export function screamingSnakeCase<T extends string>(str: T): ScreamingSnakeCase<T> {
+  const words = splitWords(str);
+  if (words.length === 0) return '' as ScreamingSnakeCase<T>;
+  
+  return words
+    .map(word => word.toUpperCase())
+    .join('_') as ScreamingSnakeCase<T>;
 }

@@ -26,7 +26,8 @@ import {
   camelCase,
   pascalCase,
   snakeCase,
-  kebabCase
+  kebabCase,
+  screamingSnakeCase
 } from 'convert-case-ts';
 
 // Simple conversions
@@ -54,6 +55,9 @@ const snake = snakeCase("helloWorld");
 
 const kebab = kebabCase("HelloWorld");
 // Type: KebabCase<"HelloWorld">, Value: "hello-world"
+
+const screamingSnake = screamingSnakeCase("helloWorld");
+// Type: ScreamingSnakeCase<"helloWorld">, Value: "HELLO_WORLD"
 ```
 
 ## API
@@ -144,6 +148,18 @@ kebabCase("hello world");   // "hello-world"
 kebabCase("hello_world");   // "hello-world"
 kebabCase("helloWorld");    // "hello-world"
 kebabCase("HelloWorld");    // "hello-world"
+```
+
+#### `screamingSnakeCase<T>(str: T): ScreamingSnakeCase<T>`
+
+Converts a string to SCREAMING_SNAKE_CASE. Handles space, hyphen, and underscore-separated words, as well as camelCase and PascalCase input.
+
+**Examples:**
+```typescript
+screamingSnakeCase("hello world");   // "HELLO_WORLD"
+screamingSnakeCase("hello-world");   // "HELLO_WORLD"
+screamingSnakeCase("helloWorld");    // "HELLO_WORLD"
+screamingSnakeCase("HelloWorld");    // "HELLO_WORLD"
 ```
 
 ## Building

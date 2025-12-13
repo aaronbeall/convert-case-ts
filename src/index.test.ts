@@ -7,7 +7,8 @@ import {
   camelCase,
   pascalCase,
   snakeCase,
-  kebabCase
+  kebabCase,
+  screamingSnakeCase
 } from './index';
 
 describe('uppercase', () => {
@@ -306,6 +307,53 @@ describe('kebabCase', () => {
   });
 });
 
+describe('screamingSnakeCase', () => {
+  it('should convert space-separated words to SCREAMING_SNAKE_CASE', () => {
+    const result: "HELLO_WORLD" = screamingSnakeCase('hello world');
+    expect(result).toBe('HELLO_WORLD');
+  });
+
+  it('should convert hyphen-separated words to SCREAMING_SNAKE_CASE', () => {
+    const result: "HELLO_WORLD" = screamingSnakeCase('hello-world');
+    expect(result).toBe('HELLO_WORLD');
+  });
+
+  it('should convert camelCase to SCREAMING_SNAKE_CASE', () => {
+    const result: "HELLO_WORLD" = screamingSnakeCase('helloWorld');
+    expect(result).toBe('HELLO_WORLD');
+  });
+
+  it('should convert PascalCase to SCREAMING_SNAKE_CASE', () => {
+    const result: "HELLO_WORLD" = screamingSnakeCase('HelloWorld');
+    expect(result).toBe('HELLO_WORLD');
+  });
+
+  it('should convert snake_case to SCREAMING_SNAKE_CASE', () => {
+    const result: "HELLO_WORLD" = screamingSnakeCase('hello_world');
+    expect(result).toBe('HELLO_WORLD');
+  });
+
+  it('should handle already SCREAMING_SNAKE_CASE string', () => {
+    const result: "HELLO_WORLD" = screamingSnakeCase('HELLO_WORLD');
+    expect(result).toBe('HELLO_WORLD');
+  });
+
+  it('should handle multiple words', () => {
+    const result: "HELLO_WORLD_FOO_BAR" = screamingSnakeCase('hello world foo bar');
+    expect(result).toBe('HELLO_WORLD_FOO_BAR');
+  });
+
+  it('should handle empty string', () => {
+    const result: "" = screamingSnakeCase('');
+    expect(result).toBe('');
+  });
+
+  it('should handle single word', () => {
+    const result: "HELLO" = screamingSnakeCase('hello');
+    expect(result).toBe('HELLO');
+  });
+});
+
 // Type safety tests - these should compile without errors
 describe('Type safety', () => {
   it('should allow assignment to string type', () => {
@@ -318,6 +366,7 @@ describe('Type safety', () => {
     const pascal: string = pascalCase("hello-world");
     const snake: string = snakeCase("helloWorld");
     const kebab: string = kebabCase("helloWorld");
+    const screamingSnake: string = screamingSnakeCase("helloWorld");
     
     expect(upper).toBe("HELLO");
     expect(lower).toBe("hello");
@@ -327,6 +376,7 @@ describe('Type safety', () => {
     expect(pascal).toBe("HelloWorld");
     expect(snake).toBe("hello_world");
     expect(kebab).toBe("hello-world");
+    expect(screamingSnake).toBe("HELLO_WORLD");
   });
 
   it('should infer correct literal types', () => {
@@ -353,17 +403,20 @@ describe('Type safety', () => {
     const pascal = pascalCase("hello-world");
     const snake = snakeCase("helloWorld");
     const kebab = kebabCase("helloWorld");
+    const screamingSnake = screamingSnakeCase("helloWorld");
     
     // These type assertions prove the transformations work at type level
     const camelCheck: "helloWorld" = camel;
     const pascalCheck: "HelloWorld" = pascal;
     const snakeCheck: "hello_world" = snake;
     const kebabCheck: "hello-world" = kebab;
+    const screamingSnakeCheck: "HELLO_WORLD" = screamingSnake;
     
     expect(camelCheck).toBe("helloWorld");
     expect(pascalCheck).toBe("HelloWorld");
     expect(snakeCheck).toBe("hello_world");
     expect(kebabCheck).toBe("hello-world");
+    expect(screamingSnakeCheck).toBe("HELLO_WORLD");
   });
 
   // Negative tests - these should NOT compile if uncommented
@@ -392,6 +445,9 @@ describe('Type safety', () => {
     // @ts-expect-error - wrong literal type
     const wrongKebab: "hello_world" = kebabCase("helloWorld");
     
+    // @ts-expect-error - wrong literal type
+    const wrongScreamingSnake: "hello_world" = screamingSnakeCase("helloWorld");
+    
     // Verify runtime values are still correct
     expect(wrongUpper).toBe("HELLO");
     expect(wrongLower).toBe("hello");
@@ -400,5 +456,6 @@ describe('Type safety', () => {
     expect(wrongPascal).toBe("HelloWorld");
     expect(wrongSnake).toBe("hello_world");
     expect(wrongKebab).toBe("hello-world");
+    expect(wrongScreamingSnake).toBe("HELLO_WORLD");
   });
 });
