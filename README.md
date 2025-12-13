@@ -18,28 +18,49 @@ npm install convert-case-ts
 ## Usage
 
 ```typescript
-import { uppercase, lowercase, capitalize, uncapitalize } from 'convert-case-ts';
+import { 
+  uppercase, 
+  lowercase, 
+  capitalize, 
+  uncapitalize,
+  camelCase,
+  pascalCase,
+  snakeCase,
+  kebabCase
+} from 'convert-case-ts';
 
-// Uppercase conversion
+// Simple conversions
 const upper = uppercase("hello");
 // Type: "HELLO", Value: "HELLO"
 
-// Lowercase conversion
 const lower = lowercase("HELLO");
 // Type: "hello", Value: "hello"
 
-// Capitalize first character
 const cap = capitalize("hello world");
 // Type: "Hello world", Value: "Hello world"
 
-// Uncapitalize first character
 const uncap = uncapitalize("Hello World");
 // Type: "hello World", Value: "hello World"
+
+// Complex case conversions
+const camel = camelCase("hello-world");
+// Type: CamelCase<"hello-world">, Value: "helloWorld"
+
+const pascal = pascalCase("hello world");
+// Type: PascalCase<"hello world">, Value: "HelloWorld"
+
+const snake = snakeCase("helloWorld");
+// Type: SnakeCase<"helloWorld">, Value: "hello_world"
+
+const kebab = kebabCase("HelloWorld");
+// Type: KebabCase<"HelloWorld">, Value: "hello-world"
 ```
 
 ## API
 
-### `uppercase<T>(str: T): Uppercase<T>`
+### Simple Case Conversions
+
+#### `uppercase<T>(str: T): Uppercase<T>`
 
 Converts a string to uppercase.
 
@@ -48,7 +69,7 @@ Converts a string to uppercase.
 uppercase("hello"); // "HELLO"
 ```
 
-### `lowercase<T>(str: T): Lowercase<T>`
+#### `lowercase<T>(str: T): Lowercase<T>`
 
 Converts a string to lowercase.
 
@@ -57,7 +78,7 @@ Converts a string to lowercase.
 lowercase("HELLO"); // "hello"
 ```
 
-### `capitalize<T>(str: T): Capitalize<T>`
+#### `capitalize<T>(str: T): Capitalize<T>`
 
 Capitalizes the first character of a string.
 
@@ -66,13 +87,63 @@ Capitalizes the first character of a string.
 capitalize("hello"); // "Hello"
 ```
 
-### `uncapitalize<T>(str: T): Uncapitalize<T>`
+#### `uncapitalize<T>(str: T): Uncapitalize<T>`
 
 Uncapitalizes the first character of a string.
 
 **Example:**
 ```typescript
 uncapitalize("Hello"); // "hello"
+```
+
+### Complex Case Conversions
+
+#### `camelCase<T>(str: T): CamelCase<T>`
+
+Converts a string to camelCase. Handles space, hyphen, and underscore-separated words, as well as PascalCase input.
+
+**Examples:**
+```typescript
+camelCase("hello world");   // "helloWorld"
+camelCase("hello-world");   // "helloWorld"
+camelCase("hello_world");   // "helloWorld"
+camelCase("HelloWorld");    // "helloWorld"
+```
+
+#### `pascalCase<T>(str: T): PascalCase<T>`
+
+Converts a string to PascalCase. Handles space, hyphen, and underscore-separated words, as well as camelCase input.
+
+**Examples:**
+```typescript
+pascalCase("hello world");  // "HelloWorld"
+pascalCase("hello-world");  // "HelloWorld"
+pascalCase("hello_world");  // "HelloWorld"
+pascalCase("helloWorld");   // "HelloWorld"
+```
+
+#### `snakeCase<T>(str: T): SnakeCase<T>`
+
+Converts a string to snake_case. Handles space, hyphen-separated words, camelCase, and PascalCase input.
+
+**Examples:**
+```typescript
+snakeCase("hello world");   // "hello_world"
+snakeCase("hello-world");   // "hello_world"
+snakeCase("helloWorld");    // "hello_world"
+snakeCase("HelloWorld");    // "hello_world"
+```
+
+#### `kebabCase<T>(str: T): KebabCase<T>`
+
+Converts a string to kebab-case. Handles space, underscore-separated words, camelCase, and PascalCase input.
+
+**Examples:**
+```typescript
+kebabCase("hello world");   // "hello-world"
+kebabCase("hello_world");   // "hello-world"
+kebabCase("helloWorld");    // "hello-world"
+kebabCase("HelloWorld");    // "hello-world"
 ```
 
 ## Building
