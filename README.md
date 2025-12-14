@@ -1,6 +1,8 @@
 # convert-case-ts
 
-A TypeScript library for type-safe string case conversion. Each function returns a properly typed result using TypeScript's template literal types.
+A TypeScript library for type-safe string case conversion. Each function returns a properly typed result using TypeScript's template literal types, for example `capitalize("hello")` returns `Capitalize<"hello">` (literal type `"Hello"`).
+
+Suitable for dynamically transforming programmatic identifiers in a type-safe way.
 
 ## Installation
 
@@ -15,7 +17,7 @@ npm install convert-case-ts
 - 🎯 **Simple API**: Easy to use with intuitive function names
 - 💪 **TypeScript First**: Built with TypeScript for TypeScript projects
 
-## Usage
+## Basic Usage
 
 ```typescript
 import { 
@@ -67,6 +69,103 @@ const plural = pluralize("property");
 
 const singular = singularize("items");
 //    ^? const singular: "item" = "item"
+
+```
+
+## Practical Example
+
+Because the conversion methods and returns types are kept in sync, you can use them to easily create mapped APIs based on source keys. 
+
+```ts
+// Create type-safe API methods and constants from a key
+function createAccessors<K extends string>(key: K) {
+  const camel = camelCase(key);
+  const pascal = pascalCase(key);
+  const screaming = screamingSnakeCase(key);
+  
+  return {
+    getter: `get${pascal}` as const,
+    setter: `set${pascal}` as const,
+    constant: screaming,
+    property: camel,
+  };
+}
+
+const userApi = createAccessors("user-profile");
+//    ^? const userApi: {
+//         getter: "getUserProfile";
+//         setter: "setUserProfile";
+//         constant: "USER_PROFILE";
+//         property: "userProfile";
+//       }
+
+// Use the type-safe names
+const handlers = {
+  [userApi.getter]: () => ({ name: "John" }),
+  [userApi.setter]: (data: unknown) => console.log(data),
+};
+//    ^? const handlers: {
+//         getUserProfile: () => { name: string; };
+//         setUserProfile: (data: unknown) => void;
+//       }
+```
+## Type Usage Example
+
+The complex case conversion types can be used to accurately map types coming from other systems, like CSS-in-JS systems, without directly using the conversion functions.
+
+```ts
+import type { CamelCase, KebabCase } from 'convert-case-ts';
+
+// Convert CSS kebab-case properties to JavaScript camelCase
+type CSSPropsToJS<T> = {
+  [K in keyof T as CamelCase<K & string>]: T[K];
+};
+
+// Define CSS custom properties (CSS variables)
+interface CSSCustomProperties {
+  '--primary-color': string;
+  '--background-color': string;
+  '--font-family': string;
+  '--border-radius': string;
+  '--max-width': string;
+  '--z-index': number;
+}
+
+// Automatically get camelCase JavaScript property names
+type ThemeProps = CSSPropsToJS<CSSCustomProperties>;
+//   ^? type ThemeProps = {
+//        primaryColor: string;
+//        backgroundColor: string;
+//        fontFamily: string;
+//        borderRadius: string;
+//        maxWidth: string;
+//        zIndex: number;
+//      }
+
+// Use in a typed theme configuration
+const theme: ThemeProps = {
+  primaryColor: '#007bff',
+  backgroundColor: '#ffffff',
+  fontFamily: 'Inter, sans-serif',
+  borderRadius: '8px',
+  maxWidth: '1200px',
+  zIndex: 1000,
+};
+
+// Convert back to CSS variable names for style injection
+type ToCSSVars<T> = {
+  [K in keyof T as `--${KebabCase<K & string>}`]: T[K];
+};
+
+type CSSVars = ToCSSVars<ThemeProps>;
+//   ^? type CSSVars = {
+//        "--primary-color": string;
+//        "--background-color": string;
+//        "--font-family": string;
+//        "--border-radius": string;
+//        "--max-width": string;
+//        "--z-index": number;
+//      }
 ```
 
 ## API
