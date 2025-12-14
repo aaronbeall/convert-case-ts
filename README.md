@@ -1,21 +1,15 @@
 # convert-case-ts
 
-A TypeScript library for type-safe string case conversion. Each function returns a properly typed result using TypeScript's template literal types, for example `capitalize("hello")` returns `Capitalize<"hello">` (literal type `"Hello"`).
+A TypeScript library for type-safe string case conversion. Each function returns a properly typed result using TypeScript's template literal types, for example `capitalize("hello")` returns `Capitalize<"hello">` (literal type `"Hello"`), suitable for dynamically mapping programmatic identifiers in a type-safe way.
 
-Suitable for dynamically transforming programmatic identifiers in a type-safe way.
+Includes additional complex case conversion literal types not currently shipped with TypeScript, like `CamelCase<T>` and `SnakeCase<T>`.
+
 
 ## Installation
 
 ```bash
 npm install convert-case-ts
 ```
-
-## Features
-
-- 🔒 **Type-safe**: Functions return typed results (e.g., `Capitalize<T>`, `Uppercase<T>`)
-- 📦 **Lightweight**: No dependencies
-- 🎯 **Simple API**: Easy to use with intuitive function names
-- 💪 **TypeScript First**: Built with TypeScript for TypeScript projects
 
 ## Basic Usage
 
@@ -74,7 +68,7 @@ const singular = singularize("items");
 
 ## Practical Example
 
-Because the conversion methods and returns types are kept in sync, you can use them to easily create mapped APIs based on source keys. 
+Because the conversion methods and returned literal types are correlated, you can use the methods to easily create mapped APIs based on source keys with type-safe results. 
 
 ```ts
 // Create type-safe API methods and constants from a key
