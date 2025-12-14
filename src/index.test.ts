@@ -8,7 +8,9 @@ import {
   pascalCase,
   snakeCase,
   kebabCase,
-  screamingSnakeCase
+  screamingSnakeCase,
+  pluralize,
+  singularize
 } from './index';
 
 describe('uppercase', () => {
@@ -457,5 +459,98 @@ describe('Type safety', () => {
     expect(wrongSnake).toBe("hello_world");
     expect(wrongKebab).toBe("hello-world");
     expect(wrongScreamingSnake).toBe("HELLO_WORLD");
+  });
+});
+describe('pluralize', () => {
+  it('should add s to regular words', () => {
+    const result: "items" = pluralize('item');
+    expect(result).toBe('items');
+  });
+
+  it('should change y to ies', () => {
+    const result: "properties" = pluralize('property');
+    expect(result).toBe('properties');
+  });
+
+  it('should change y to ies for city', () => {
+    const result: "cities" = pluralize('city');
+    expect(result).toBe('cities');
+  });
+
+  it('should add es to words ending in s', () => {
+    const result: "classes" = pluralize('class');
+    expect(result).toBe('classes');
+  });
+
+  it('should add es to words ending in x', () => {
+    const result: "indexes" = pluralize('index');
+    expect(result).toBe('indexes');
+  });
+
+  it('should add es to words ending in z', () => {
+    const result: "quizes" = pluralize('quiz');
+    expect(result).toBe('quizes');
+  });
+
+  it('should add es to words ending in ch', () => {
+    const result: "batches" = pluralize('batch');
+    expect(result).toBe('batches');
+  });
+
+  it('should add es to words ending in sh', () => {
+    const result: "hashes" = pluralize('hash');
+    expect(result).toBe('hashes');
+  });
+
+  it('should handle empty string', () => {
+    const result = pluralize('');
+    expect(result).toBe('');
+  });
+});
+
+describe('singularize', () => {
+  it('should remove s from regular plural words', () => {
+    const result: "item" = singularize('items');
+    expect(result).toBe('item');
+  });
+
+  it('should change ies back to y', () => {
+    const result: "property" = singularize('properties');
+    expect(result).toBe('property');
+  });
+
+  it('should change cities back to city', () => {
+    const result: "city" = singularize('cities');
+    expect(result).toBe('city');
+  });
+
+  it('should remove es from words ending in xes', () => {
+    const result: "index" = singularize('indexes');
+    expect(result).toBe('index');
+  });
+
+  it('should remove es from words ending in zes', () => {
+    const result: "quiz" = singularize('quizes');
+    expect(result).toBe('quiz');
+  });
+
+  it('should remove es from words ending in ches', () => {
+    const result: "batch" = singularize('batches');
+    expect(result).toBe('batch');
+  });
+
+  it('should remove es from words ending in shes', () => {
+    const result: "hash" = singularize('hashes');
+    expect(result).toBe('hash');
+  });
+
+  it('should remove es from words ending in sses', () => {
+    const result: "class" = singularize('classes');
+    expect(result).toBe('class');
+  });
+
+  it('should handle empty string', () => {
+    const result: "" = singularize('');
+    expect(result).toBe('');
   });
 });

@@ -127,6 +127,36 @@ type ScreamingSnakeCaseRest<T extends string[]> =
     ? `_${Uppercase<First>}${ScreamingSnakeCaseRest<Rest>}`
     : '';
 
+/**
+ * Converts a string to its plural form
+ */
+export type Pluralize<S extends string> = 
+  S extends `${infer Rest}y`
+    ? `${Rest}ies`
+    : S extends `${string}${'s' | 'x' | 'z' | 'ch' | 'sh'}`
+      ? `${S}es`
+      : `${S}s`;
+
+/**
+ * Converts a string to its singular form
+ */
+export type Singularize<S extends string> = 
+  S extends `${infer Rest}ies`
+    ? `${Rest}y`
+    : S extends `${infer Rest}ses`
+      ? `${Rest}s`
+      : S extends `${infer Rest}xes`
+        ? `${Rest}x`
+        : S extends `${infer Rest}zes`
+          ? `${Rest}z`
+          : S extends `${infer Rest}ches`
+            ? `${Rest}ch`
+            : S extends `${infer Rest}shes`
+              ? `${Rest}sh`
+              : S extends `${infer Rest}s`
+                ? Rest
+                : S;
+
 // ============================================================================
 // Simple Case Conversions
 // ============================================================================
@@ -292,4 +322,77 @@ export function screamingSnakeCase<T extends string>(str: T): ScreamingSnakeCase
   return words
     .map(word => word.toUpperCase())
     .join('_') as ScreamingSnakeCase<T>;
+}
+/**
+ * Converts a string to its plural form with type-safe return type
+ * Applies simple pluralization rules suitable for programmatic identifiers
+ * 
+ * @param str - The string to convert
+ * @returns The plural version of the string
+ * 
+ * @example
+ * const result = pluralize("property"); // "properties"
+ * const result2 = pluralize("index"); // "indexes"
+ * const result3 = pluralize("item"); // "items"
+ */
+export function pluralize<T extends string>(str: T): Pluralize<T> {
+  if (str.length === 0) return '' as any;
+  
+  // Words ending in y: change to ies
+  if (str[str.length - 1] === 'y') {
+    return `${str.slice(0, -1)}ies` as Pluralize<T>;
+  }
+  
+  // Words ending in s, x, z, ch, sh: add "es"
+  const last = str[str.length - 1];
+  const last2 = str.slice(-2);
+  if (last === 's' || last === 'x' || last === 'z' || last2 === 'ch' || last2 === 'sh') {
+    return `${str}es` as Pluralize<T>;
+  }
+  
+  // Default: add s
+  return `${str}s` as Pluralize<T>;
+}
+
+/**
+ * Converts a string to its singular form with type-safe return type
+ * Applies simple singularization rules suitable for programmatic identifiers
+ * 
+ * @param str - The string to convert
+ * @returns The singular version of the string
+ * 
+ * @example
+ * const result = singularize("properties"); // "property"
+ * const result2 = singularize("indexes"); // "index"
+ * const result3 = singularize("items"); // "item"
+ */
+export function singularize<T extends string>(str: T): Singularize<T> {
+  if (str.length === 0) return str as Singularize<T>;
+  
+  const s = str as string;
+  
+  // Words ending in ies: change to y
+  if (s.endsWith('ies') && s.length > 3) {
+    return `${s.slice(0, -3)}y` as Singularize<T>;
+  }
+  
+  // Words ending in ses, xes, zes, ches, shes: remove es
+  if (s.endsWith('es') && s.length > 2) {
+    const before = s.slice(-4, -2);
+    if (before === 'ch' || before === 'sh' || before === 'ss') {
+      return s.slice(0, -2) as Singularize<T>;
+    }
+    const charBefore = s[s.length - 3];
+    if (charBefore === 's' || charBefore === 'x' || charBefore === 'z') {
+      return s.slice(0, -2) as Singularize<T>;
+    }
+  }
+  
+  // Words ending in s: remove s
+  if (s.endsWith('s') && s.length > 1) {
+    return s.slice(0, -1) as Singularize<T>;
+  }
+  
+  // Default: return as-is
+  return s as Singularize<T>;
 }

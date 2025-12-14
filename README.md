@@ -27,37 +27,46 @@ import {
   pascalCase,
   snakeCase,
   kebabCase,
-  screamingSnakeCase
+  screamingSnakeCase,
+  pluralize,
+  singularize
 } from 'convert-case-ts';
 
 // Simple conversions
 const upper = uppercase("hello");
-// Type: "HELLO", Value: "HELLO"
+//    ^? const upper: "HELLO" = "HELLO"
 
 const lower = lowercase("HELLO");
-// Type: "hello", Value: "hello"
+//    ^? const lower: "hello" = "hello"
 
 const cap = capitalize("hello world");
-// Type: "Hello world", Value: "Hello world"
+//    ^? const cap: "Hello world" = "Hello world"
 
 const uncap = uncapitalize("Hello World");
-// Type: "hello World", Value: "hello World"
+//    ^? const uncap: "hello World" = "hello World"
 
 // Complex case conversions
 const camel = camelCase("hello-world");
-// Type: CamelCase<"hello-world">, Value: "helloWorld"
+//    ^? const camel: "helloWorld" = "helloWorld"
 
 const pascal = pascalCase("hello world");
-// Type: PascalCase<"hello world">, Value: "HelloWorld"
+//    ^? const pascal: "HelloWorld" = "HelloWorld"
 
 const snake = snakeCase("helloWorld");
-// Type: SnakeCase<"helloWorld">, Value: "hello_world"
+//    ^? const snake: "hello_world" = "hello_world"
 
 const kebab = kebabCase("HelloWorld");
-// Type: KebabCase<"HelloWorld">, Value: "hello-world"
+//    ^? const kebab: "hello-world" = "hello-world"
 
 const screamingSnake = screamingSnakeCase("helloWorld");
-// Type: ScreamingSnakeCase<"helloWorld">, Value: "HELLO_WORLD"
+//    ^? const screamingSnake: "HELLO_WORLD" = "HELLO_WORLD"
+
+// Pluralization
+const plural = pluralize("property");
+//    ^? const plural: "properties" = "properties"
+
+const singular = singularize("items");
+//    ^? const singular: "item" = "item"
 ```
 
 ## API
@@ -161,7 +170,43 @@ screamingSnakeCase("hello-world");   // "HELLO_WORLD"
 screamingSnakeCase("helloWorld");    // "HELLO_WORLD"
 screamingSnakeCase("HelloWorld");    // "HELLO_WORLD"
 ```
+### Pluralization
 
+#### `pluralize<T>(str: T): Pluralize<T>`
+
+Converts a string to its plural form using simple pluralization rules suitable for programmatic identifiers.
+
+**Rules:**
+- Words ending in `y` → `ies` (property → properties)
+- Words ending in `s`, `x`, `z`, `ch`, `sh` → add `es` (class → classes, index → indexes)
+- Default → add `s` (item → items)
+
+**Examples:**
+```typescript
+pluralize("property");  // "properties"
+pluralize("index");     // "indexes"
+pluralize("item");      // "items"
+pluralize("class");     // "classes"
+pluralize("batch");     // "batches"
+```
+
+#### `singularize<T>(str: T): Singularize<T>`
+
+Converts a string to its singular form using simple singularization rules suitable for programmatic identifiers.
+
+**Rules:**
+- Words ending in `ies` → `y` (properties → property)
+- Words ending in `ses`, `xes`, `zes`, `ches`, `shes` → remove `es` (classes → class, indexes → index)
+- Words ending in `s` → remove `s` (items → item)
+
+**Examples:**
+```typescript
+singularize("properties");  // "property"
+singularize("indexes");     // "index"
+singularize("items");       // "item"
+singularize("classes");     // "class"
+singularize("batches");     // "batch"
+```
 ## Building
 
 ```bash
