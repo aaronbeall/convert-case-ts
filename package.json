@@ -22,10 +22,30 @@
     "capitalize",
     "uppercase",
     "lowercase",
-    "type-safe"
+    "type-safe",
+    "camelCase",
+    "PascalCase",
+    "snake_case",
+    "kebab-case",
+    "SCREAMING_SNAKE_CASE",
+    "pluralize",
+    "singularize",
+    "case-conversion",
+    "string-manipulation",
+    "type-inference",
+    "literal-types",
+    "template-literal"
   ],
-  "author": "",
+  "author": "Aaron Beall <contact@abeall.com>",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aaronbeall/convert-case-ts.git"
+  },
+  "bugs": {
+    "url": "https://github.com/aaronbeall/convert-case-ts/issues"
+  },
+  "homepage": "https://github.com/aaronbeall/convert-case-ts#readme",
   "devDependencies": {
     "typescript": "^5.3.0",
     "vitest": "^1.0.0"
