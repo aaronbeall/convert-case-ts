@@ -66,44 +66,127 @@ const singular = singularize("items");
 
 ```
 
-## Practical Example
+## Example: Convert object keys to/from camelCase/snake_case
 
-Because the conversion methods and returned literal types are correlated, you can use the methods to easily create mapped APIs based on source keys with type-safe results. 
+A common use case is converting entire object structures between naming conventions, such as when working with APIs that use snake_case while your JavaScript code uses camelCase.
 
 ```ts
-// Create type-safe API methods and constants from a key
+import { camelCase, snakeCase } from 'convert-case-ts';
+import type { CamelCase, SnakeCase } from 'convert-case-ts';
+
+// Type-level conversion: transform all object keys to camelCase
+type ObjectToCamelKeys<T> = {
+  [K in keyof T as CamelCase<K & string>]: T[K];
+};
+
+// Type-level conversion: transform all object keys to snake_case
+type ObjectToSnakeKeys<T> = {
+  [K in keyof T as SnakeCase<K & string>]: T[K];
+};
+
+// Runtime conversion: convert object keys to camelCase
+function objectToCamelKeys<T extends Record<string, any>>(obj: T): ObjectToCamelKeys<T> {
+  return Object.fromEntries(
+    Object.entries(obj).map(([key, value]) => [camelCase(key), value])
+  ) as ObjectToCamelKeys<T>;
+}
+
+// Runtime conversion: convert object keys to snake_case
+function objectToSnakeKeys<T extends Record<string, any>>(obj: T): ObjectToSnakeKeys<T> {
+  return Object.fromEntries(
+    Object.entries(obj).map(([key, value]) => [snakeCase(key), value])
+  ) as ObjectToSnakeKeys<T>;
+}
+
+// Example: API response with snake_case keys
+const apiResponse = {
+  user_id: 123,
+  first_name: "John",
+  last_name: "Doe",
+  email_address: "john@example.com",
+  is_active: true,
+};
+
+// Convert to camelCase for use in JavaScript
+const user = objectToCamelKeys(apiResponse);
+//    ^? const user: {
+//         userId: number;
+//         firstName: string;
+//         lastName: string;
+//         emailAddress: string;
+//         isActive: boolean;
+//       }
+
+console.log(user.firstName); // "John"
+console.log(user.emailAddress); // "john@example.com"
+
+// Convert back to snake_case for API requests
+const payload = objectToSnakeKeys(user);
+//    ^? const payload: {
+//         user_id: number;
+//         first_name: string;
+//         last_name: string;
+//         email_address: string;
+//         is_active: boolean;
+//       }
+```
+
+## Example: Mapped API keys
+
+Generate type-safe API objects with methods, constants, and properties dynamically derived from a single key. The conversion functions preserve literal types, ensuring the resulting object keys are fully typed.
+
+```ts
+import { camelCase, pascalCase, screamingSnakeCase } from 'convert-case-ts';
+
+// Create type-safe API object with methods, constants, and properties from a key
 function createAccessors<K extends string>(key: K) {
-  const camel = camelCase(key);
-  const pascal = pascalCase(key);
-  const screaming = screamingSnakeCase(key);
+  // Create the API as [key, value] entries
+  const getter = [
+    `get${pascalCase(key)}` as const, () => ({})
+  ] as const;
+  const setter = [
+    `set${pascalCase(key)}` as const, (profile: {}) => {}
+  ] as const;
+  const constant = [
+    screamingSnakeCase(key), key
+  ] as const;
+  const property = [
+    camelCase(key), {}
+  ] as const
   
-  return {
-    getter: `get${pascal}` as const,
-    setter: `set${pascal}` as const,
-    constant: screaming,
-    property: camel,
+  return (Object.fromEntries([getter, setter, constant, property])) as {
+    [K in typeof getter[0]]: typeof getter[1];
+  } & {
+    [K in typeof setter[0]]: typeof setter[1];
+  } & {
+    [K in typeof constant[0]]: typeof constant[1];
+  } & {
+    [K in typeof property[0]]: typeof property[1]
   };
 }
 
 const userApi = createAccessors("user-profile");
 //    ^? const userApi: {
-//         getter: "getUserProfile";
-//         setter: "setUserProfile";
-//         constant: "USER_PROFILE";
-//         property: "userProfile";
+//         getUserProfile: () => {};
+//         setUserProfile: (value: {}) => void;
+//         USER_PROFILE: "user-profile";
+//         userProfile: {};
 //       }
 
-// Use the type-safe names
-const handlers = {
-  [userApi.getter]: () => ({ name: "John" }),
-  [userApi.setter]: (data: unknown) => console.log(data),
-};
-//    ^? const handlers: {
-//         getUserProfile: () => { name: string; };
-//         setUserProfile: (data: unknown) => void;
-//       }
+// Use the type-safe API
+userApi.getUserProfile();
+//      ^? (method) getUserProfile(): {}}
+
+userApi.setUserProfile({ name: "John" });
+//      ^? (method) setUserProfile(value: {}): void
+
+const constantValue = userApi.USER_PROFILE;
+//    ^? const constantValue: "user-profile"
+
+const userProfile = userApi.userProfile;
+//    ^? const userProfile: {}
 ```
-## Type Usage Example
+## Example: CSS to JS map types
 
 The complex case conversion types can be used to accurately map types coming from other systems, like CSS-in-JS systems, without directly using the conversion functions.
 
