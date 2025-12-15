@@ -66,7 +66,7 @@ const singular = singularize("items");
 
 ```
 
-## Example: Convert object keys to/from camelCase/snake_case
+## Example: Convert object keys
 
 A common use case is converting entire object structures between naming conventions, such as when working with APIs that use snake_case while your JavaScript code uses camelCase.
 
